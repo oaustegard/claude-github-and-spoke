@@ -16,16 +16,15 @@ the session with GitHub access, then you work across any repo your token reaches
 
 | File | Purpose |
 |------|---------|
-| `boot.sh` | Installs `gh`, authenticates with your token |
+| `boot.sh` | Installs `gh` CLI, authenticates with your token |
 | `.claude/settings.json` | SessionStart hook + denies MCP GitHub server |
-| `Containerfile` | Container-layer spec for caching `gh` across sessions |
 | `CLAUDE.md` | Agent instructions — tells Claude about hub/spoke |
 
 ## How it works
 
 The `SessionStart` hook runs `boot.sh`, which:
 1. Sources all `*.env` files for credentials
-2. Installs `gh` CLI if not already present
+2. Installs `gh` CLI if not already present (~3s)
 3. Authenticates with `$GH_TOKEN`
 
 The MCP GitHub server is denied in settings because it can only see the hub
