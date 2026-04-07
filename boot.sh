@@ -20,8 +20,9 @@ done
 # ── Install gh if not present ──
 if ! command -v gh &>/dev/null; then
     echo "Installing gh CLI..."
-    GH_VER=$(curl -sL https://api.github.com/repos/cli/cli/releases/latest \
-        | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
+    # Use redirect trick to avoid API rate limits (no auth needed)
+    GH_VER=$(curl -sIL -o /dev/null -w '%{url_effective}' https://github.com/cli/cli/releases/latest | grep -oP '[^/v]+$')
+    if [ -z "$GH_VER" ]; then GH_VER="2.74.0"; fi  # fallback
     curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VER}/gh_${GH_VER}_linux_amd64.tar.gz" \
         | tar -xz --strip-components=2 -C /usr/local/bin "gh_${GH_VER}_linux_amd64/bin/gh"
     echo "✓ gh $GH_VER installed"
