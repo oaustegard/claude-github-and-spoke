@@ -38,7 +38,7 @@ This extracts the core GitHub integration from
 (see [PR #12](https://github.com/oaustegard/claude-workspace/pull/12))
 into a standalone template anyone can use.
 
-For the full story, see the [Container Layer Hack](https://muninn.austegard.com/posts/container-layer-hack/) post.
+For the full story, see the [Container Layer Hack](https://austegard.com/blog/custom-container-layers-for-claudes-ephemeral-machines.html) post.
 
 ## License
 
