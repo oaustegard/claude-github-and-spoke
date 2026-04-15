@@ -15,9 +15,9 @@ you can work across **any repo your token can reach** — not just this one.
 
 From any CCotw session started in this repo, you can:
 ```bash
-# Clone and work in a spoke repo
-gh repo clone myuser/some-project /tmp/some-project
-cd /tmp/some-project
+# Clone and work in a spoke repo (always under ./.spokes/ — see below)
+gh repo clone myuser/some-project .spokes/some-project
+cd .spokes/some-project
 
 # Create branches, commits, PRs in spoke repos
 gh pr create --repo myuser/some-project --title "Fix: ..." --body "..."
@@ -25,6 +25,27 @@ gh pr create --repo myuser/some-project --title "Fix: ..." --body "..."
 # View issues across your repos
 gh issue list --repo myuser/some-project
 ```
+
+### Spoke clone convention: `.spokes/`
+
+**Always clone spoke repos to `./.spokes/<repo-name>` inside this workspace,
+not to `/tmp/` or `/home/user/`.** The directory is gitignored, so spoke
+checkouts never pollute the hub's git state.
+
+**Why this matters.** Anthropic's container ships `/tmp/code-sign` (wired
+into git as `gpg.ssh.program`) which forwards every commit-signing request
+to a remote signing service. That service resolves its "source" field from
+the signer's cwd and only recognizes paths inside the hub repo where the
+session was started. Committing from a spoke clone located anywhere else
+fails with:
+
+```
+signing server returned status 400: {"error":{"message":"missing source"}}
+```
+
+Cloning spokes under `./.spokes/` keeps the signer's cwd-walk inside the
+hub, so signing works without per-repo `commit.gpgsign=false` hacks or
+temp-directory shuffles.
 
 ## Why deny the MCP GitHub server?
 
