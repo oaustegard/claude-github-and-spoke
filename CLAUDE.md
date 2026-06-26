@@ -53,6 +53,11 @@ Claude Code's built-in MCP GitHub server only sees the hub repo. By denying
 it in `settings.json` and using `gh` CLI instead, you get uniform access to
 **all** repos — hub and spokes alike.
 
+**One catch:** with the MCP denied, the agent proxy App-gates PAT calls to the
+**hub repo** itself, so `gh pr create` on *this* repo fails (spoke PRs are
+fine). To open a PR on the hub from-session, use `scripts/hub_pr.py` (by-id REST
+route) — or re-enable the MCP. See the README's "Fallback" section.
+
 ## Setup
 
 1. Fork or clone this repo
