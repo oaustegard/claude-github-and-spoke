@@ -31,10 +31,20 @@ else
 fi
 
 # ── Authenticate ──
+# `gh auth status` reports a valid token as invalid in this environment.
+# Probe /user for the status code instead; never echo the header.
 if [ -n "$GH_TOKEN" ]; then
     echo "$GH_TOKEN" | gh auth login --with-token 2>/dev/null || true
-    GH_USER=$(gh api user -q .login 2>/dev/null || echo "unknown")
-    echo "✓ Authenticated as $GH_USER"
+    CODE=$(curl -s -o /dev/null -w '%{http_code}' \
+        -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user || true)
+    if [ "$CODE" = "200" ]; then
+        echo "✓ Token valid (authenticated as $(gh api user -q .login 2>/dev/null || echo unknown))"
+    else
+        echo "⚠ Token probe returned $CODE — if calls fail, suspect the agent proxy, not the token"
+    fi
 else
     echo "⚠ No GH_TOKEN found — gh will be unauthenticated"
 fi
+
+# Repos beyond this one are reached with the add_repo tool, not with a wider
+# token: the proxy scopes by session repo set. See CLAUDE.md.
